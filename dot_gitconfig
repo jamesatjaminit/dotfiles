@@ -1,0 +1,10 @@
+[gpg]
+	format = ssh
+[user]
+	name = James Cook
+	email = james@jaminit.co.uk
+[push]
+	autoSetupRemote = true
+
+[init]
+	defaultBranch = main
