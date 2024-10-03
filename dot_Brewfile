@@ -1,4 +1,4 @@
-brew "1password-cli"
+cask "1password-cli"
 brew "bat"
 tap "oven-sh/bun"
 brew "bun"
