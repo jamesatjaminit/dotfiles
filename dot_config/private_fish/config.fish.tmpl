@@ -1,3 +1,6 @@
+fish_add_path /opt/homebrew/bin
+fish_add_path /opt/homebrew/opt/node@20/bin
+fish_add_path /opt/homebrew/opt/rustup/bin
 if status is-interactive
    alias cat 'bat'
    alias dig 'doggo'
@@ -6,8 +9,6 @@ if status is-interactive
    set -x HOMEBREW_NO_ENV_HINTS true
    set -x EDITOR 'nano'
    set -x VISUAL 'code'
+   echo -e "\nsource "(brew --prefix asdf)"/libexec/asdf.fish" >> ~/.config/fish/config.fish
 end
 
-fish_add_path /opt/homebrew/bin
-fish_add_path /opt/homebrew/opt/node@20/bin
-fish_add_path /opt/homebrew/opt/rustup/bin
