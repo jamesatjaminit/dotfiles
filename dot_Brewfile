@@ -1,4 +1,5 @@
 cask "1password-cli"
+brew "asdf"
 brew "bat"
 tap "oven-sh/bun"
 brew "bun"
