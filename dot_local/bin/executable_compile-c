@@ -6,6 +6,8 @@ import { exists, lstat, mkdir } from 'node:fs/promises';
 import { $ } from 'bun';
 import { EOL } from "node:os";
 
+const GCC_FLAGS = ["-Wall","-pedantic-errors", "-ansi", "-Werror=return-type"]
+
 let args: string[] = process.argv.slice(2);
 let path: string = args[0];
 
@@ -66,7 +68,7 @@ const outputFilePath = [outputFolderPath, inputFileName.substring(0, inputFileNa
 // Compile C file
 let output;
 try {
-	output = await $`gcc -Wall -pedantic-errors -ansi -Werror=return-type -o ${outputFilePath} ${path}`.quiet();
+	output = await $`gcc ${GCC_FLAGS.join(' ')} -o ${outputFilePath} ${path}`.quiet();
 	output.stdout?.toString() && console.log(output.stdout.toString());
 	output.stderr?.toString() && console.log(output.stderr.toString());
 } catch (err) {
