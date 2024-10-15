@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 // Copyright 2024 James Cook, james AT jaminit.co.uk
+// This script makes an out/ folder, compiles the C program and adds the out/ directory to the .gitignore file
 import { resolve, isAbsolute, extname, sep } from 'node:path';
 import { exists, lstat, mkdir } from 'node:fs/promises';
 import { $ } from 'bun';
