@@ -8,7 +8,7 @@ import { EOL } from "node:os";
 let args: string[] = process.argv.slice(2);
 let path: string = args[0];
 
-if (typeof path === 'undefined') {
+if (typeof path === 'undefined' || path === '--help' || path === '-h') {
 	const helpText = `compile-c is a simple program to automate the process of compiling C coursework
 usage:
 	compile-c <pathToFile>
