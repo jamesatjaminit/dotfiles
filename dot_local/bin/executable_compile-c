@@ -1,0 +1,105 @@
+#!/usr/bin/env bun
+// Copyright 2024 James Cook, james AT jaminit.co.uk
+import { resolve, isAbsolute, extname, sep } from 'node:path';
+import { exists, lstat, mkdir } from 'node:fs/promises';
+import { $ } from 'bun';
+import { EOL } from "node:os";
+
+let args: string[] = process.argv.slice(2);
+let path: string = args[0];
+
+if (typeof path === 'undefined') {
+	const helpText = `compile-c is a simple program to automate the process of compiling C coursework
+usage:
+	compile-c <pathToFile>
+	
+	<pathToFile> is a filepath to a C file`;
+	console.log(helpText);
+	process.exit(0);
+}
+
+if (!isAbsolute(path)) {
+	path = `${process.cwd()}/${path}`;
+}
+
+try {
+	path = resolve(path);
+} catch {
+	console.error('error: Failed to resolve path of input file');
+	process.exit(1);
+}
+
+if (!(await exists(path))) {
+	console.error('error: Input file does not exist');
+	process.exit(1);
+}
+
+
+let outputFilePathSplit: string[] = path.split(sep);
+outputFilePathSplit.pop();
+outputFilePathSplit.push("out");
+let outputFolderPath = outputFilePathSplit.join(sep);
+
+
+if (!(await exists(outputFolderPath))) {
+	try {
+		await mkdir(outputFolderPath);
+	} catch {
+		console.error('error: Failed to create output folder');
+		process.exit(1);
+	}
+} else {
+	const folder = await lstat(outputFolderPath);
+	if (!folder.isDirectory()) {
+		console.error('error: Output folder exists, but is not a directory');
+		process.exit(1);
+	}
+}
+
+const inputFileName = path.split(sep).at(-1)!;
+
+const outputFilePath = [outputFolderPath, inputFileName.substring(0, inputFileName.length - extname(inputFileName).length)].join(sep);
+
+// Compile c file
+let output;
+try {
+	output = await $`gcc -Wall -pedantic-errors -ansi -o ${outputFilePath} ${path}`.quiet();
+	output.stdout?.toString() && console.log(output.stdout.toString());
+	output.stderr?.toString() && console.log(output.stderr.toString());
+} catch (err) {
+	console.error("error: Error occured when compiling code");
+	console.log("");
+	err.stdout?.toString() && console.log(err.stdout.toString());
+	err.stderr?.toString() && console.log(err.stderr.toString());
+	process.exit(1);
+}
+
+const gitignorePath = outputFolderPath.split(sep);
+gitignorePath.pop();
+gitignorePath.push(".gitignore");
+
+const gitignoreFile = Bun.file(gitignorePath.join(sep));
+const gitignoreExists = await gitignoreFile.exists();
+
+if (gitignoreExists) {
+	const fileLstat = await lstat(gitignorePath.join(sep));
+	if (!fileLstat.isFile()) {
+		console.error("error: .gitignore file is not a regular file, skipping modifying");
+		process.exit(1);
+	}
+}
+
+
+const writer = gitignoreFile.writer();
+
+if (gitignoreExists) {
+	const contents: string[] = (await gitignoreFile.text()).split(EOL); // Probably could use a stream here
+	if (contents.includes("out/")) {
+		// Gitignore file already contents "out/"
+		process.exit(0);
+	}
+	writer.write(contents.join(EOL));
+}
+writer.write(`${gitignoreExists ? EOL : ""}out/`); // Only write a newline if the file is new
+writer.end();
+process.exit(0)
