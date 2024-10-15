@@ -6,7 +6,7 @@ import { exists, lstat, mkdir } from 'node:fs/promises';
 import { $ } from 'bun';
 import { EOL } from "node:os";
 
-const GCC_FLAGS = ["-Wall","-pedantic-errors", "-ansi", "-Werror=return-type"]
+const GCC_FLAGS = ["-Wall", "-pedantic-errors", "-ansi", "-Werror=return-type"]
 
 let args: string[] = process.argv.slice(2);
 let path: string = args[0];
@@ -14,9 +14,10 @@ let path: string = args[0];
 if (typeof path === 'undefined' || path === '--help' || path === '-h') {
 	const helpText = `compile-c is a simple program to automate the process of compiling C coursework
 usage:
-	compile-c <pathToFile>
+	compile-c <pathToFile> [...extraArgs]
 	
-	<pathToFile> is a filepath to a C file`;
+	<pathToFile> is a filepath to a C file
+	[...extraArgs] extra arguments passed to gcc`;
 	console.log(helpText);
 	process.exit(0);
 }
@@ -68,7 +69,8 @@ const outputFilePath = [outputFolderPath, inputFileName.substring(0, inputFileNa
 // Compile C file
 let output;
 try {
-	output = await $`gcc ${GCC_FLAGS.join(' ')} -o ${outputFilePath} ${path}`.quiet();
+	let extraArguments = args.slice(1)
+	output = await $`gcc ${{ raw: GCC_FLAGS.join(' ') }} ${{ raw: extraArguments.join(" ") }} -o ${outputFilePath} ${path}`.quiet();
 	output.stdout?.toString() && console.log(output.stdout.toString());
 	output.stderr?.toString() && console.log(output.stderr.toString());
 } catch (err) {
