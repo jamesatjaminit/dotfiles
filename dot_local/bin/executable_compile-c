@@ -26,6 +26,7 @@ if (!isAbsolute(path)) {
 	path = `${process.cwd()}/${path}`;
 }
 
+// Check if input file exists
 try {
 	path = resolve(path);
 } catch {
@@ -46,7 +47,7 @@ outputFilePathSplit.pop();
 outputFilePathSplit.push("out");
 let outputFolderPath = outputFilePathSplit.join(sep);
 
-
+// Create out/ folder
 if (!(await exists(outputFolderPath))) {
 	try {
 		await mkdir(outputFolderPath);
@@ -64,7 +65,7 @@ if (!(await exists(outputFolderPath))) {
 
 const inputFileName = path.split(sep).at(-1)!;
 
-const outputFilePath = [outputFolderPath, inputFileName.substring(0, inputFileName.length - extname(inputFileName).length)].join(sep);
+const outputFilePath = [outputFolderPath, inputFileName.substring(0, inputFileName.length - extname(inputFileName).length)].join(sep); // Executable name should be the filename without .c
 
 // Compile C file
 let output;
@@ -81,6 +82,7 @@ try {
 	process.exit(1);
 }
 
+// Add out/ folder to .gitignore
 const gitignorePath = outputFolderPath.split(sep);
 gitignorePath.pop();
 gitignorePath.push(".gitignore");
