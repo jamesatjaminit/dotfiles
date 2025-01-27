@@ -6,7 +6,7 @@ import { exists, lstat, mkdir } from 'node:fs/promises';
 import { $ } from 'bun';
 import { EOL } from "node:os";
 
-const GCC_FLAGS = ["-Wall", "-pedantic-errors", "-ansi", "-Werror=return-type"]
+const GCC_FLAGS = ["-Wall", "-pedantic-errors", "-Werror=return-type"]
 
 let args: string[] = process.argv.slice(2);
 let path: string = args[0];
